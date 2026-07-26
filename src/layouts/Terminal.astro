@@ -1,0 +1,105 @@
+---
+import { ClientRouter } from "astro:transitions"
+import Help from "../components/Help.astro"
+import DocList from "../components/DocList.astro"
+import { listDocs } from "../lib/docs"
+import "../styles/terminal.css"
+import "../styles/markdown.css"
+import "../styles/global.css"
+
+interface Props {
+	title: string
+	/** The open document's filename, shown above the right pane. Absent on the list route. */
+	file?: string
+}
+
+const { title, file } = Astro.props
+
+// The list lives in the layout because both routes show it: the left pane is
+// always the finder, the right pane is whatever document is open.
+const docs = await listDocs()
+const count = `${docs.length} ${docs.length === 1 ? "doc" : "docs"}`
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<ClientRouter />
+	</head>
+	<body>
+		<div class:list={["term", { "has-doc": Boolean(file) }]}>
+			<div class="term-panes">
+				<!-- Persisted, so the filter text, cursor and scroll survive opening a document. -->
+				<section class="pane pane-list" aria-label="Documents" transition:persist="doc-list">
+					<header class="pane-header">
+						<span class="term-path">~/harry</span>
+						<span class="term-count">{count}</span>
+					</header>
+					<div class="pane-body">
+						<DocList docs={docs} />
+					</div>
+				</section>
+
+				<section class="pane pane-doc" aria-label="Document">
+					<header class="pane-header">
+						<span class="term-path">{file ?? "---"}</span>
+						<span class="pane-header-right">
+							{file && <a class="term-back narrow-only" href="/">← files</a>}
+							{/* Filled by pager.ts with the scroll position, if there is one. */}
+							<span class="term-count" data-term-meta></span>
+						</span>
+					</header>
+					<div class="pane-body" data-term-body tabindex="-1">
+						<slot />
+					</div>
+				</section>
+			</div>
+
+			<footer class="term-status">
+				<span class="keys-only">
+					{/* Which hints apply depends on where the keyboard is; find.ts sets `is-finding`. */}
+					<span class="status-find">
+						<kbd>↑/↓</kbd> navigate
+						<span class="sep">·</span>
+						<kbd>enter</kbd> open
+						<span class="sep">·</span>
+						<kbd>esc</kbd> {file ? "document" : "clear"}
+					</span>
+					<span class="status-doc">
+						{
+							file ? (
+								<Fragment>
+									<kbd>space</kbd> page
+									<span class="sep">·</span>
+									<kbd>g/G</kbd> top/bottom
+									<span class="sep">·</span>
+									<kbd>/</kbd> find
+								</Fragment>
+							) : (
+								<Fragment>
+									<kbd>/</kbd> find
+								</Fragment>
+							)
+						}
+					</span>
+				</span>
+				<span class="touch-only">tap a document to open it</span>
+				<span class="keys-only"><kbd>?</kbd> help</span>
+			</footer>
+		</div>
+
+		<Help />
+	</body>
+</html>
+
+<script>
+	import "../scripts/help"
+	import "../scripts/find"
+	import "../scripts/pager"
+</script>

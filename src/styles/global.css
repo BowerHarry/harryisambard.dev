@@ -1,0 +1,85 @@
+/*
+ * The photo layer. These live outside .file-content — React portals the popup
+ * and the gallery into <body> — so they are styled here, from the same tokens
+ * as the rest of the terminal.
+ */
+
+.photo-link {
+	color: var(--cursor);
+	font-weight: 600;
+	text-decoration: underline;
+	text-decoration-style: dashed;
+	text-decoration-color: color-mix(in srgb, var(--cursor) 55%, transparent);
+	text-underline-offset: 0.15em;
+	cursor: pointer;
+}
+
+.photo-link:hover,
+.photo-link:focus-visible {
+	color: var(--path);
+	text-decoration-style: solid;
+}
+
+.photo-popup {
+	display: flex;
+	gap: 0.4rem;
+	padding: 0.4rem;
+	background: var(--bg);
+	border: 1px solid var(--cursor);
+	border-radius: 4px;
+	box-shadow: 0 8px 28px rgb(0 0 0 / 18%);
+}
+
+.photo-popup img {
+	display: block;
+	height: auto;
+	border-radius: 2px;
+	cursor: pointer;
+}
+
+.photo-gallery {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	grid-template-rows: 1fr auto;
+	place-items: center;
+	gap: 1rem;
+	padding: 2rem 1rem 1.2rem;
+	background: rgb(8 8 10 / 88%);
+}
+
+.photo-gallery figure {
+	margin: 0;
+	display: grid;
+	gap: 0.6rem;
+	justify-items: center;
+	align-content: center;
+}
+
+.photo-gallery img {
+	display: block;
+	max-width: 90vw;
+	max-height: 76vh;
+	width: auto;
+	height: auto;
+	border: 1px solid rgb(255 255 255 / 20%);
+	border-radius: 3px;
+}
+
+.photo-gallery figcaption {
+	color: #f2f2f5;
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+}
+
+.photo-hint {
+	margin: 0;
+	color: rgb(242 242 245 / 65%);
+	font-family: var(--mono);
+	font-size: 0.75rem;
+}
+
+.photo-hint kbd {
+	color: #f2f2f5;
+	font: inherit;
+}

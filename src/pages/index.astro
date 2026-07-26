@@ -1,17 +1,13 @@
 ---
-
+import Terminal from "../layouts/Terminal.astro"
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Terminal title="Harry Bower">
+	<div class="doc-none">
+		<p>no document open</p>
+		<p class="keys-only">
+			pick one on the left — <kbd>↑/↓</kbd> then <kbd>enter</kbd>
+		</p>
+		<p class="touch-only">tap a document to open it</p>
+	</div>
+</Terminal>

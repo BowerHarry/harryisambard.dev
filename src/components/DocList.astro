@@ -1,0 +1,47 @@
+---
+import type { Doc } from "../lib/docs"
+
+interface Props {
+	docs: Doc[]
+}
+
+// `Doc.updated` still orders the list; it just isn't shown against each row.
+const { docs } = Astro.props
+---
+
+<div class="find">
+	<input
+		id="find"
+		class="find-input"
+		type="text"
+		autocomplete="off"
+		autocapitalize="off"
+		spellcheck="false"
+		placeholder="Search"
+		aria-label="Search documents"
+		aria-controls="doc-list"
+		data-find
+	/>
+</div>
+
+<ul class="docs" id="doc-list" data-doc-list>
+	{
+		docs.map((doc) => (
+			<li
+				class="doc"
+				data-doc
+				data-doc-id={doc.id}
+				data-haystack={`${doc.filename} ${doc.title}`.toLowerCase()}
+			>
+				<a class="doc-link" href={`/${doc.id}`}>
+					<span class="doc-cursor" aria-hidden="true">▌</span>
+					<span class="doc-name" data-text={doc.filename}>
+						{doc.filename}
+					</span>
+				</a>
+			</li>
+		))
+	}
+</ul>
+
+<p class="docs-empty" hidden data-docs-empty>no matching documents</p>

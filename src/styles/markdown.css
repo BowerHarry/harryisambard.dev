@@ -1,0 +1,294 @@
+/*
+ * The document pane.
+ *
+ * Every selector stays prefixed with .file-content so nothing here reaches the
+ * terminal chrome, or the photo popup and gallery — React portals those into
+ * <body>, outside the pane entirely.
+ *
+ * Read like a page, not like source: no Markdown syntax survives the render —
+ * no hashes before headings, no markers — and nothing carries a hue. Structure
+ * is told in weight, size and space alone, the way iA Writer's preview does it.
+ * Prose stays proportional at a readable measure, because a 9,000-word
+ * dissertation in monospace is a punishment; code and tables keep the
+ * monospace. Colours come from the tokens in terminal.css, so the pane follows
+ * the browser's light/dark preference along with everything else.
+ */
+
+.file-content {
+	max-width: 66ch;
+	margin: 0 auto;
+	padding-bottom: 6rem;
+	font-family: var(--sans);
+	font-size: 1.0625rem;
+	line-height: 1.75;
+	color: var(--fg);
+	/* Long words break rather than push the measure out. */
+	overflow-wrap: break-word;
+}
+
+/* ── headings: the body face, told apart by weight and space ─────────────── */
+
+.file-content h1,
+.file-content h2,
+.file-content h3,
+.file-content h4,
+.file-content h5,
+.file-content h6 {
+	margin: 2.6rem 0 0.9rem;
+	color: inherit;
+	font-weight: 700;
+	line-height: 1.28;
+	letter-spacing: -0.011em;
+}
+
+.file-content > :first-child {
+	margin-top: 0;
+}
+
+.file-content h1 { font-size: 1.75rem; }
+.file-content h2 { font-size: 1.3125rem; }
+.file-content h3 { font-size: 1.125rem; }
+
+.file-content h4,
+.file-content h5,
+.file-content h6 {
+	font-size: 1rem;
+}
+
+/* Past h3 the size runs out; these say "heading" by weight and colour instead. */
+.file-content h5,
+.file-content h6 {
+	color: var(--dim);
+}
+
+/* ── prose ───────────────────────────────────────────────────────────────── */
+
+.file-content p {
+	margin: 0 0 1.3rem;
+}
+
+.file-content strong {
+	font-weight: 700;
+}
+
+.file-content em {
+	font-style: italic;
+}
+
+/* Links are ink like everything else; the underline is what marks them. */
+.file-content a {
+	color: inherit;
+	text-decoration: underline;
+	text-decoration-color: color-mix(in srgb, currentcolor 35%, transparent);
+	text-underline-offset: 0.18em;
+	text-decoration-thickness: from-font;
+}
+
+.file-content a:hover {
+	text-decoration-color: currentcolor;
+}
+
+.file-content hr {
+	margin: 2rem 0;
+	border: 0;
+	border-top: 1px dashed var(--rule);
+}
+
+.file-content blockquote {
+	margin: 1.6rem 0;
+	padding: 0 0 0 2ch;
+	border-left: 2px solid var(--rule);
+	color: var(--dim);
+}
+
+.file-content blockquote > :last-child {
+	margin-bottom: 0;
+}
+
+.file-content ul,
+.file-content ol {
+	margin: 0 0 1.15rem;
+	padding-left: 2.5ch;
+}
+
+.file-content li {
+	margin: 0.25rem 0;
+}
+
+.file-content li::marker {
+	color: var(--dim);
+}
+
+.file-content .contains-task-list {
+	list-style: none;
+	padding-left: 0.5ch;
+}
+
+.file-content .task-list-item input {
+	accent-color: var(--cursor);
+	margin-right: 0.6ch;
+}
+
+.file-content mark {
+	background: var(--cursor-bg);
+	color: inherit;
+	padding: 0 0.2em;
+}
+
+.file-content sup {
+	font-size: 0.78em;
+	vertical-align: super;
+	line-height: 0;
+}
+
+.file-content sup a {
+	font-family: var(--mono);
+	text-decoration: none;
+}
+
+.file-content kbd {
+	padding: 0.1em 0.45em;
+	border: 1px solid var(--rule);
+	border-bottom-width: 2px;
+	border-radius: 3px;
+	background: var(--code-bg);
+	font-family: var(--mono);
+	font-size: 0.82em;
+}
+
+/* ── code ────────────────────────────────────────────────────────────────── */
+
+.file-content code,
+.file-content pre {
+	font-family: var(--mono);
+}
+
+.file-content code {
+	padding: 0.1em 0.4em;
+	border-radius: 3px;
+	background: var(--code-bg);
+	color: var(--fg);
+	font-size: 0.85em;
+}
+
+.file-content pre {
+	margin: 1.4rem 0;
+	padding: 0.9rem 1rem;
+	/* Shiki writes its theme's background inline, so the panel colour has to
+	   outrank it to stay in step with the rest of the terminal. */
+	background: var(--code-bg) !important;
+	border: 1px solid var(--rule);
+	border-radius: 4px;
+	overflow-x: auto;
+	font-size: 0.8125rem;
+	line-height: 1.55;
+}
+
+/* Cancels the inline-code background above, which would otherwise tile across
+   an entire fenced block. */
+.file-content pre code {
+	padding: 0;
+	background: none;
+	border-radius: 0;
+	font-size: inherit;
+}
+
+/* Shiki still tokenises, and hangs each theme's colour off the token — as custom
+   properties under the config's `defaultColor: false`, inline without it. The
+   palette is ink only, so none of it is read and `!important` covers the inline
+   case; the italics and weights stay, being shape rather than colour. */
+.file-content .astro-code,
+.file-content .astro-code span {
+	color: var(--fg) !important;
+	font-style: var(--shiki-light-font-style, inherit);
+	font-weight: var(--shiki-light-font-weight, inherit);
+}
+
+@media (prefers-color-scheme: dark) {
+	.file-content .astro-code,
+	.file-content .astro-code span {
+		font-style: var(--shiki-dark-font-style, inherit);
+		font-weight: var(--shiki-dark-font-weight, inherit);
+	}
+}
+
+/* ── tables ──────────────────────────────────────────────────────────────── */
+
+.file-content table {
+	width: 100%;
+	margin: 1.4rem 0;
+	border-collapse: collapse;
+	font-family: var(--mono);
+	font-size: 0.8125rem;
+}
+
+.file-content th,
+.file-content td {
+	padding: 0.45rem 1ch 0.45rem 0;
+	text-align: left;
+	border-bottom: 1px solid var(--rule);
+	vertical-align: top;
+}
+
+/* GFM writes column alignment as an attribute, which the rule above outranks. */
+.file-content th[align="center"],
+.file-content td[align="center"] { text-align: center; }
+
+.file-content th[align="right"],
+.file-content td[align="right"] { text-align: right; }
+
+.file-content th {
+	font-weight: 700;
+}
+
+/* ── media and detail ────────────────────────────────────────────────────── */
+
+.file-content img {
+	max-width: 100%;
+	height: auto;
+	border: 1px solid var(--rule);
+	border-radius: 3px;
+}
+
+.file-content details {
+	margin: 1.4rem 0;
+	padding: 0.6rem 1rem;
+	border: 1px solid var(--rule);
+	border-radius: 4px;
+}
+
+.file-content summary {
+	cursor: pointer;
+	font-size: 0.9375rem;
+	font-weight: 600;
+}
+
+.file-content .footnotes {
+	margin-top: 2.5rem;
+	padding-top: 1.2rem;
+	border-top: 1px dashed var(--rule);
+	color: var(--dim);
+	font-size: 0.9375rem;
+}
+
+.file-content .sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+@media print {
+	.file-content,
+	.file-content * {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
+
+	.file-content table,
+	.file-content pre {
+		page-break-inside: avoid;
+	}
+}

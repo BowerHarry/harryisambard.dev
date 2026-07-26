@@ -1,0 +1,29 @@
+---
+import { render } from "astro:content"
+import Terminal from "../layouts/Terminal.astro"
+import PhotoLayer from "../components/PhotoLayer.tsx"
+import { listDocEntries } from "../lib/docs"
+import { buildPhotos } from "../lib/photos"
+
+export async function getStaticPaths() {
+	const entries = await listDocEntries()
+	return entries.map(({ doc, entry }) => ({ params: { id: doc.id }, props: { doc, entry } }))
+}
+
+const { doc, entry } = Astro.props
+
+// `<Content />` also resolves the images referenced from the Markdown body,
+// which the old fetch-the-HTML-as-JSON approach could not do.
+const { Content } = await render(entry)
+const photos = await buildPhotos(entry.data.photos)
+---
+
+{/* The scroll position is left to pager.ts, which knows whether there is one. */}
+<Terminal title={doc.title} file={doc.filename}>
+	<PhotoLayer photos={photos} client:idle>
+		<main class="file-content" data-doc-page data-doc-id={doc.id}>
+			<h1>{doc.title}</h1>
+			<Content />
+		</main>
+	</PhotoLayer>
+</Terminal>

@@ -1,0 +1,28 @@
+---
+/**
+ * The `?` overlay. Both panes are live at once, so both key sets are listed;
+ * which one acts depends on whether the filter box has focus.
+ */
+---
+
+<div class="help" hidden data-help>
+	<div class="help-panel" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+		<p class="help-title">find</p>
+		<dl class="help-keys">
+			<dt><kbd>a–z</kbd></dt><dd>filter the list</dd>
+			<dt><kbd>↑/↓</kbd> <kbd>j/k</kbd></dt><dd>move the cursor</dd>
+			<dt><kbd>enter</kbd></dt><dd>open on the right</dd>
+			<dt><kbd>esc</kbd></dt><dd>clear, then back to the document</dd>
+		</dl>
+
+		<p class="help-title">document</p>
+		<dl class="help-keys">
+			<dt><kbd>↑/↓</kbd> <kbd>j/k</kbd></dt><dd>scroll a line</dd>
+			<dt><kbd>space</kbd> <kbd>d/u</kbd></dt><dd>scroll a page</dd>
+			<dt><kbd>g</kbd> <kbd>G</kbd></dt><dd>top / bottom</dd>
+			<dt><kbd>/</kbd> <kbd>esc</kbd></dt><dd>back to find</dd>
+		</dl>
+
+		<p class="help-dismiss"><kbd>?</kbd> or <kbd>esc</kbd> to close</p>
+	</div>
+</div>
