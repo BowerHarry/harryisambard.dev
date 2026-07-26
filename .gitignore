@@ -16,6 +16,10 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.dev.vars
+
+# wrangler's local state; wrangler.jsonc itself is committed
+.wrangler/
 
 # macOS-specific files
 .DS_Store

@@ -1,0 +1,17 @@
+{
+	// Deploys the built site as a static-assets Worker: no `main`, so there is no
+	// server-side code, just the prerendered output of `astro build`.
+	//
+	// This file also stops `wrangler deploy` running its auto-configuration, which
+	// would otherwise add the Cloudflare SSR adapter and write a config of its own.
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "harryisambard-dev",
+	"compatibility_date": "2026-07-26",
+	"assets": {
+		"directory": "./dist",
+		// Astro writes each page as `<route>/index.html`; this serves those at
+		// `/route`, with or without the trailing slash.
+		"html_handling": "auto-trailing-slash",
+		"not_found_handling": "404-page"
+	}
+}
