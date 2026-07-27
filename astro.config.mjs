@@ -9,14 +9,9 @@ import rehypePhotoLinks from './src/plugins/rehype-photo-links.mjs';
 export default defineConfig({
   integrations: [react()],
   markdown: {
-    // `defaultColor: false` keeps Shiki's colours out of inline styles, where
-    // they would beat the stylesheet. The pane renders every token in ink, so
-    // nothing reads them today; the themes stay configured because that is the
-    // one edit needed to bring highlighting back.
-    shikiConfig: {
-      themes: { light: 'github-light', dark: 'github-dark' },
-      defaultColor: false
-    },
+    // The document pane is ink only, so highlighting would render every token
+    // the same colour anyway. Turning it off keeps the markup plain.
+    syntaxHighlight: false,
     processor: unified({ rehypePlugins: [rehypePhotoLinks] })
   }
 });

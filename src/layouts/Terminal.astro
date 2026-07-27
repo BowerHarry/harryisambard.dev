@@ -29,7 +29,7 @@ const count = `${docs.length} ${docs.length === 1 ? "doc" : "docs"}`
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="color-scheme" content="light dark" />
 		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
+		<title>~/harry</title>
 		<ClientRouter />
 	</head>
 	<body>
@@ -62,8 +62,8 @@ const count = `${docs.length} ${docs.length === 1 ? "doc" : "docs"}`
 			</div>
 
 			<footer class="term-status">
+				{/* Which set applies depends on where the keyboard is; find.ts sets `is-finding`. */}
 				<span class="keys-only">
-					{/* Which hints apply depends on where the keyboard is; find.ts sets `is-finding`. */}
 					<span class="status-find">
 						<kbd>↑/↓</kbd> navigate
 						<span class="sep">·</span>
@@ -73,20 +73,16 @@ const count = `${docs.length} ${docs.length === 1 ? "doc" : "docs"}`
 					</span>
 					<span class="status-doc">
 						{
-							file ? (
+							file && (
 								<Fragment>
 									<kbd>space</kbd> page
 									<span class="sep">·</span>
 									<kbd>g/G</kbd> top/bottom
 									<span class="sep">·</span>
-									<kbd>/</kbd> find
-								</Fragment>
-							) : (
-								<Fragment>
-									<kbd>/</kbd> find
 								</Fragment>
 							)
 						}
+						<kbd>/</kbd> find
 					</span>
 				</span>
 				<span class="touch-only">tap a document to open it</span>

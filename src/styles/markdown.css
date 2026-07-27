@@ -174,9 +174,7 @@
 .file-content pre {
 	margin: 1.4rem 0;
 	padding: 0.9rem 1rem;
-	/* Shiki writes its theme's background inline, so the panel colour has to
-	   outrank it to stay in step with the rest of the terminal. */
-	background: var(--code-bg) !important;
+	background: var(--code-bg);
 	border: 1px solid var(--rule);
 	border-radius: 4px;
 	overflow-x: auto;
@@ -191,25 +189,6 @@
 	background: none;
 	border-radius: 0;
 	font-size: inherit;
-}
-
-/* Shiki still tokenises, and hangs each theme's colour off the token — as custom
-   properties under the config's `defaultColor: false`, inline without it. The
-   palette is ink only, so none of it is read and `!important` covers the inline
-   case; the italics and weights stay, being shape rather than colour. */
-.file-content .astro-code,
-.file-content .astro-code span {
-	color: var(--fg) !important;
-	font-style: var(--shiki-light-font-style, inherit);
-	font-weight: var(--shiki-light-font-weight, inherit);
-}
-
-@media (prefers-color-scheme: dark) {
-	.file-content .astro-code,
-	.file-content .astro-code span {
-		font-style: var(--shiki-dark-font-style, inherit);
-		font-weight: var(--shiki-dark-font-weight, inherit);
-	}
 }
 
 /* ── tables ──────────────────────────────────────────────────────────────── */

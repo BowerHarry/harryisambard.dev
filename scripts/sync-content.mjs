@@ -30,8 +30,8 @@ const TARGETS = [
 	{ remote: '/photos', local: 'src/content/photos', keep: /\.(png|jpe?g|webp|avif|gif|svg)$/i },
 ];
 
-/** How many downloads to have in flight. Dropbox is fine with this; be polite. */
-const CONCURRENCY = 4;
+/** How many files to download at once. Dropbox is fine with this; be polite. */
+const BATCH = 4;
 
 const log = (message) => console.log(`[content] ${message}`);
 
@@ -140,16 +140,6 @@ async function download(token, remotePath) {
 	return Buffer.from(await response.arrayBuffer());
 }
 
-/** Run `work` over `items`, a few at a time. */
-async function pool(items, work) {
-	const queue = [...items];
-	const runners = Array.from({ length: Math.min(CONCURRENCY, queue.length) }, async () => {
-		for (let item = queue.shift(); item; item = queue.shift()) await work(item);
-	});
-
-	await Promise.all(runners);
-}
-
 async function syncTarget(token, target, entries) {
 	const dir = path.join(ROOT, target.local);
 	await mkdir(dir, { recursive: true });
@@ -164,18 +154,24 @@ async function syncTarget(token, target, entries) {
 			target.keep.test(entry.name)
 	);
 
-	let written = 0;
-	await pool(wanted, async (entry) => {
+	// Skip anything already byte-identical; a no-op sync should cost nothing.
+	const changed = [];
+	for (const entry of wanted) {
 		const file = path.join(dir, path.basename(entry.path_display));
+		if (existsSync(file) && contentHash(await readFile(file)) === entry.content_hash) continue;
+		changed.push(entry);
+	}
 
-		// Skip anything already byte-identical; a no-op sync should cost nothing.
-		if (existsSync(file) && contentHash(await readFile(file)) === entry.content_hash) return;
+	for (let at = 0; at < changed.length; at += BATCH) {
+		await Promise.all(
+			changed.slice(at, at + BATCH).map(async (entry) => {
+				const file = path.join(dir, path.basename(entry.path_display));
+				await writeFile(file, await download(token, entry.path_lower));
+			})
+		);
+	}
 
-		await writeFile(file, await download(token, entry.path_lower));
-		written += 1;
-	});
-
-	// `updated` in frontmatter wins, but docs.ts falls back to the mtime, so it
+	// docs.ts falls back to the mtime when frontmatter has no `updated`, so it
 	// has to carry Dropbox's timestamp rather than the moment we downloaded.
 	for (const entry of wanted) {
 		const when = new Date(entry.server_modified);
@@ -189,7 +185,7 @@ async function syncTarget(token, target, entries) {
 
 	log(
 		`${target.local}: ${wanted.length} file${wanted.length === 1 ? '' : 's'}` +
-			` (${written} downloaded, ${stale.length} removed)`
+			` (${changed.length} downloaded, ${stale.length} removed)`
 	);
 }
 

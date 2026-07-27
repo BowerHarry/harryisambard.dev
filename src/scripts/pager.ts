@@ -42,8 +42,10 @@ function init() {
 		if (event.metaKey || event.ctrlKey || event.altKey) return;
 		// The gallery and the help panel own the keyboard while they're up.
 		if (overlayOpen()) return;
-		// So does the filter box, whenever it has focus.
-		if (document.activeElement instanceof HTMLInputElement) return;
+		// So does the filter box while it has focus. Reading the event's target
+		// rather than the focus means an Escape that blurs the box in find.ts is
+		// still recognised here as having been the box's key.
+		if (event.target instanceof HTMLInputElement) return;
 
 		const page = pane!.clientHeight * 0.9;
 

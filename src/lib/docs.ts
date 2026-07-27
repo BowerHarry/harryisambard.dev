@@ -1,5 +1,5 @@
 import { statSync } from 'node:fs';
-import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 
 /**
  * The only module that talks to `astro:content`. Everything else — routes, the
@@ -17,7 +17,7 @@ export type Doc = {
 	updated: Date;
 };
 
-export type DocEntry = CollectionEntry<'files'>;
+type DocEntry = CollectionEntry<'files'>;
 
 function filenameOf(entry: DocEntry) {
 	return entry.filePath?.split('/').pop() ?? `${entry.id}.md`;
@@ -26,7 +26,8 @@ function filenameOf(entry: DocEntry) {
 function updatedAt(entry: DocEntry) {
 	if (entry.data.updated) return entry.data.updated;
 
-	// A local-only fallback. A remote loader would provide `updated` itself.
+	// The Dropbox sync stamps each file's mtime with Dropbox's own timestamp,
+	// so this stays meaningful for documents without an `updated` in frontmatter.
 	try {
 		if (entry.filePath) return statSync(entry.filePath).mtime;
 	} catch {
@@ -36,7 +37,7 @@ function updatedAt(entry: DocEntry) {
 	return new Date(0);
 }
 
-export function toDoc(entry: DocEntry): Doc {
+function toDoc(entry: DocEntry): Doc {
 	return {
 		id: entry.id,
 		filename: filenameOf(entry),
@@ -49,13 +50,6 @@ export function toDoc(entry: DocEntry): Doc {
 export async function listDocs(): Promise<Doc[]> {
 	const entries = await getCollection('files');
 	return entries.map(toDoc).sort((a, b) => b.updated.getTime() - a.updated.getTime());
-}
-
-/** The full entry for one document, for rendering its page. */
-export async function getDoc(id: string) {
-	const entry = await getEntry('files', id);
-	if (!entry) return undefined;
-	return { doc: toDoc(entry), entry };
 }
 
 /** Entries paired with their `Doc`, for `getStaticPaths`. */

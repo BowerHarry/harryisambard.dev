@@ -1,12 +1,12 @@
 {
-  "name": "",
+  "name": "harryisambard-dev",
   "type": "module",
   "version": "0.0.1",
   "engines": {
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev",
+    "dev": "npm run sync && astro dev",
     "sync": "node scripts/sync-content.mjs",
     "build": "npm run sync && astro build",
     "preview": "astro preview",
