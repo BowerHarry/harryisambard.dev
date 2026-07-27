@@ -203,6 +203,17 @@ async function main() {
 	};
 
 	if (!credentials.key || !credentials.secret || !credentials.refresh) {
+		// Locally this is normal: build against whatever is already checked out.
+		// On Pages it is not — the content is never in the repository, so carrying
+		// on would replace a working site with an empty one.
+		if (process.env.CF_PAGES) {
+			throw new Error(
+				'No Dropbox credentials in the build environment.\n' +
+					'Set DROPBOX_APP_KEY, DROPBOX_APP_SECRET and DROPBOX_REFRESH_TOKEN under\n' +
+					'Pages → Settings → Environment variables, for Production and Preview both.'
+			);
+		}
+
 		log('no Dropbox credentials, keeping the content already on disk');
 		return;
 	}
