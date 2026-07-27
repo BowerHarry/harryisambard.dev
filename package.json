@@ -7,8 +7,10 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "sync": "node scripts/sync-content.mjs",
+    "build": "npm run sync && astro build",
     "preview": "astro preview",
+    "deploy:hook": "wrangler deploy -c worker/wrangler.jsonc",
     "astro": "astro"
   },
   "dependencies": {

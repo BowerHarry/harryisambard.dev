@@ -1,0 +1,21 @@
+{
+	// The Dropbox → Pages build trigger. Deployed separately from the site, which
+	// Cloudflare Pages builds from the repository root; keeping this config in its
+	// own directory is what stops the two being mistaken for each other.
+	//
+	//   npx wrangler deploy -c worker/wrangler.jsonc
+	//
+	// Both secrets are set with `wrangler secret put`, never in this file:
+	//   DROPBOX_APP_SECRET   — verifies the notifications really are Dropbox's
+	//   PAGES_DEPLOY_HOOK    — the Pages deploy hook URL, which is itself a secret
+	"$schema": "../node_modules/wrangler/config-schema.json",
+	"name": "harryisambard-content-hook",
+	"main": "index.js",
+	"compatibility_date": "2026-07-27",
+	"observability": { "enabled": true },
+	"durable_objects": {
+		"bindings": [{ "name": "BUILDS", "class_name": "BuildScheduler" }]
+	},
+	// SQLite-backed, which is the only kind the free plan offers.
+	"migrations": [{ "tag": "v1", "new_sqlite_classes": ["BuildScheduler"] }]
+}

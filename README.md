@@ -7,12 +7,59 @@ A single-page site. The left column lists files; clicking one fetches it and ren
 | Command           | Action                                      |
 | :---------------- | :------------------------------------------ |
 | `npm run dev`     | Start the dev server at `localhost:4321`    |
+| `npm run sync`    | Mirror the content down from Dropbox        |
 | `npm run build`   | Build the production site to `./dist/`      |
 | `npm run preview` | Preview the build locally                   |
 
+## Where the content lives
+
+Documents and photos are not in this repository — `src/content/files` and
+`src/content/photos` are gitignored. They live in a Dropbox app folder:
+
+```text
+Dropbox/Apps/<app>/
+  files/*.md        →  src/content/files/
+  photos/*.png|jpg  →  src/content/photos/
+```
+
+`scripts/sync-content.mjs` mirrors that folder onto disk, and `npm run build`
+runs it first. Because the files are on disk before Astro starts, everything
+below works the same as it would for content committed to the repository.
+
+It needs `DROPBOX_APP_KEY`, `DROPBOX_APP_SECRET` and `DROPBOX_REFRESH_TOKEN`,
+read from the environment or a local `.env`. Without them the sync leaves
+whatever is already in `src/content/` alone and the build carries on, so you can
+work offline and a fork builds without secrets. Files are skipped when their
+contents already match, deletions in Dropbox propagate, and each file's mtime is
+set to Dropbox's `server_modified` — which is what the list sorts by when the
+frontmatter has no `updated`.
+
+### Publishing automatically
+
+`worker/index.js` is a small Worker, deployed separately from the site, that
+Dropbox calls whenever the folder changes. It never builds immediately: each
+notification pushes a Durable Object alarm five minutes into the future, so a
+document saved eight times while being written produces one build rather than
+eight, and no more than one build runs in any five minutes either way. That
+matters — the Pages free plan allows 500 builds a month.
+
+Deploying it, once:
+
+```sh
+npx wrangler secret put DROPBOX_APP_SECRET -c worker/wrangler.jsonc
+npx wrangler secret put PAGES_DEPLOY_HOOK -c worker/wrangler.jsonc
+npm run deploy:hook
+```
+
+Then add the Worker's URL under **Webhooks** in the Dropbox app console. Dropbox
+verifies it with a challenge request before it starts sending notifications.
+
+Neither secret belongs in the repository: the deploy hook URL is a build trigger
+for anyone who has it, and the app secret is what proves a notification is real.
+
 ## Adding a file
 
-Drop a markdown file into `src/content/files/`. The filename becomes its URL id, and `title` is required:
+Drop a markdown file into the Dropbox `files/` folder. The filename becomes its URL id, and `title` is required:
 
 ```markdown
 ---
