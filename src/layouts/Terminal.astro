@@ -3,17 +3,19 @@ import { ClientRouter } from "astro:transitions"
 import Help from "../components/Help.astro"
 import DocList from "../components/DocList.astro"
 import { listDocs } from "../lib/docs"
+import "../styles/theme.css"
 import "../styles/terminal.css"
+import "../styles/doc-list.css"
+import "../styles/help.css"
 import "../styles/markdown.css"
 import "../styles/global.css"
 
 interface Props {
-	title: string
 	/** The open document's filename, shown above the right pane. Absent on the list route. */
 	file?: string
 }
 
-const { title, file } = Astro.props
+const { file } = Astro.props
 
 // The list lives in the layout because both routes show it: the left pane is
 // always the finder, the right pane is whatever document is open.

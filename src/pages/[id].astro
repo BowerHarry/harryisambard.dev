@@ -12,13 +12,12 @@ export async function getStaticPaths() {
 
 const { doc, entry } = Astro.props
 
-// `<Content />` also resolves the images referenced from the Markdown body.
 const { Content } = await render(entry)
 const photos = await buildPhotos(entry.data.photos)
 ---
 
 {/* The scroll position is left to pager.ts, which knows whether there is one. */}
-<Terminal title={doc.title} file={doc.filename}>
+<Terminal file={doc.filename}>
 	<PhotoLayer photos={photos} client:idle>
 		<main class="file-content" data-doc-page data-doc-id={doc.id}>
 			<h1>{doc.title}</h1>

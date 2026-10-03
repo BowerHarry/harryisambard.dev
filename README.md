@@ -218,6 +218,33 @@ Dropbox at that moment.
 | `scripts/sync-content.mjs` | Dropbox → `src/content/` |
 | `worker/index.js` | Dropbox webhook → debounced Pages build |
 
+## Tests
+
+```sh
+npm test
+```
+
+[Vitest](https://vitest.dev) runs everything, in three groups set up in
+`vitest.config.mjs`. None of them touch the network, the real `.env` or
+`src/content/`.
+
+| Tests | Cover | Run in |
+| :--- | :--- | :--- |
+| `tests/sync/` | The Dropbox hash, the API calls, which files are downloaded, restamped or removed, and what happens without credentials | Node, against a fake Dropbox and a scratch folder |
+| `tests/plugins/` | The `photos:` link rewrite, its build error and its warning | Node |
+| `tests/scripts/` | Filtering, the cursor, and which pane a key goes to | jsdom, on a cut-down copy of the page |
+| `tests/worker/` | The signature check, the challenge echo, and the build scheduler's quiet window, minimum gap and retry | The Workers runtime, via `@cloudflare/vitest-pool-workers` |
+
+To run one group or one file:
+
+```sh
+npx vitest run --project worker
+npx vitest run tests/scripts/find.test.ts
+```
+
+The React photo popup and gallery, the Astro templates and the stylesheets have
+no tests; `npx astro build` is the check that they still compile.
+
 ## Deployment
 
 Cloudflare Pages builds from `main` with `npm run build` and publishes `dist`.

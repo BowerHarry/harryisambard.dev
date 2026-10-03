@@ -3,8 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 /**
  * The only module that talks to `astro:content`. Everything else — routes, the
- * list, the pager — reads the shape below, so swapping the loader in
- * `content.config.ts` for a remote one is invisible past this file.
+ * list, the pager — reads the shape below.
  */
 export type Doc = {
 	/** Route id, e.g. `yellow_sticker`. */

@@ -1,78 +1,8 @@
 /*
- * Terminal chrome: the shell the documents live inside.
- *
- * Light is the default and dark follows the browser via prefers-color-scheme.
- * The palette is black on paper and nothing else: emphasis comes from weight,
- * a grey tint or a rule, never from a hue. The token names are the old shell
- * semantics — path, cursor, scroll — but they all resolve to ink now, so a
- * single edit here would bring colour back to every view at once.
+ * Terminal chrome: the shell the documents live inside — the two panes, their
+ * headers and the status bar. The list is in doc-list.css, the `?` panel in
+ * help.css, the tokens in theme.css.
  */
-
-:root {
-	color-scheme: light dark;
-
-	--bg: #fff;
-	--fg: #16161a;
-	--dim: #8a8a90;
-	--path: #16161a;
-	--cursor: #16161a;
-	--cursor-bg: rgb(22 22 26 / 7%);
-	--scroll: #8a8a90;
-	--rule: rgb(22 22 26 / 14%);
-	--code-bg: #f2f2f2;
-	--overlay: rgb(255 255 255 / 92%);
-
-	--mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas,
-		"Liberation Mono", "Courier New", monospace;
-	--sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
-		sans-serif;
-
-	/* One place to change the terminal's gutter. */
-	--pad-x: clamp(1rem, 4vw, 2.5rem);
-	--pad-y: 1.1rem;
-}
-
-@media (prefers-color-scheme: dark) {
-	:root {
-		--bg: #000;
-		--fg: #e8e8e8;
-		--dim: #7b7b80;
-		--path: #e8e8e8;
-		--cursor: #e8e8e8;
-		--cursor-bg: rgb(232 232 232 / 11%);
-		--scroll: #7b7b80;
-		--rule: rgb(232 232 232 / 16%);
-		--code-bg: #141414;
-		--overlay: rgb(0 0 0 / 92%);
-	}
-}
-
-*,
-*::before,
-*::after {
-	box-sizing: border-box;
-}
-
-/* The terminal owns the viewport: the pane inside it is the only scroller.
-   The root needs pinning explicitly — the client router sets
-   `view-transition-name: root` on <html>, which otherwise leaves the root
-   reporting a scrollable height it doesn't have. */
-html,
-body {
-	height: 100%;
-	overflow: hidden;
-}
-
-body {
-	margin: 0;
-	background: var(--bg);
-	color: var(--fg);
-	font-family: var(--mono);
-	font-size: 0.875rem;
-	line-height: 1.6;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-}
 
 /* The screen: two panes over a status bar — the finder on the left third, the
    open document on the right two thirds.
@@ -230,164 +160,6 @@ body {
 	outline-offset: 2px;
 }
 
-/* ── list view ─────────────────────────────────────────────────────────── */
-
-.find {
-	display: flex;
-	align-items: baseline;
-	margin-bottom: 1.4rem;
-}
-
-.find-input {
-	flex: 1 1 auto;
-	min-width: 0;
-	max-width: 32ch;
-	background: none;
-	border: 0;
-	border-bottom: 1px solid var(--rule);
-	color: var(--fg);
-	font: inherit;
-	padding: 0 0 0.15rem;
-	/* Starts at the column the filenames do, past the cursor gutter. A margin
-	   rather than padding, so the rule underneath starts with the text. */
-	margin-left: 3ch;
-	caret-color: var(--cursor);
-}
-
-.find-input::placeholder {
-	color: var(--dim);
-	opacity: 0.7;
-}
-
-.find-input:focus {
-	outline: none;
-	border-bottom-color: var(--cursor);
-}
-
-.docs {
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.doc-link {
-	display: grid;
-	grid-template-columns: 1ch minmax(0, 1fr);
-	align-items: baseline;
-	gap: 0 1.5ch;
-	padding: 0.3rem 0.5ch;
-	color: inherit;
-	text-decoration: none;
-	border-radius: 3px;
-}
-
-.doc-cursor {
-	color: var(--cursor);
-	visibility: hidden;
-}
-
-.doc.is-selected .doc-link {
-	background: var(--cursor-bg);
-}
-
-.doc.is-selected .doc-cursor {
-	visibility: visible;
-}
-
-.doc.is-selected .doc-name {
-	color: var(--cursor);
-}
-
-/* The document in the right pane, which is not always where the cursor is: the
-   tinted row is the cursor, the coloured name is what's open. */
-.doc.is-open .doc-name {
-	color: var(--path);
-	font-weight: 600;
-}
-
-.doc-name {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.doc-match {
-	background: none;
-	color: var(--path);
-	font-weight: 700;
-	/* Underlined as well as coloured: the open row's name is already this colour. */
-	text-decoration: underline;
-}
-
-.docs-empty {
-	color: var(--dim);
-	margin: 0.5rem 0.5ch;
-}
-
-/* ── help overlay ──────────────────────────────────────────────────────── */
-
-.help {
-	position: fixed;
-	inset: 0;
-	display: grid;
-	place-items: center;
-	padding: 1rem;
-	background: var(--overlay);
-	backdrop-filter: blur(2px);
-}
-
-/* `display` on the rule above would otherwise beat [hidden]. */
-.help[hidden] {
-	display: none;
-}
-
-.help-panel {
-	min-width: min(26rem, 100%);
-	padding: 1.2rem 1.4rem;
-	background: var(--bg);
-	border: 1px solid var(--cursor);
-	border-radius: 4px;
-	box-shadow: 0 12px 36px rgb(0 0 0 / 18%);
-}
-
-.help-title {
-	margin: 0 0 1rem;
-	color: var(--cursor);
-	font-size: 0.8125rem;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-}
-
-/* The panel lists both key sets; each one after the first needs its own space. */
-.help-keys + .help-title {
-	margin-top: 1.4rem;
-}
-
-.help-keys {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	gap: 0.45rem 2ch;
-	margin: 0;
-}
-
-.help-keys dt {
-	color: var(--path);
-	white-space: nowrap;
-}
-
-.help-keys dd {
-	margin: 0;
-	color: var(--dim);
-}
-
-.help-dismiss {
-	margin: 1.2rem 0 0;
-	padding-top: 0.9rem;
-	border-top: 1px solid var(--rule);
-	color: var(--dim);
-	font-size: 0.8125rem;
-}
-
 .term-back {
 	color: var(--cursor);
 	text-decoration: none;
@@ -397,7 +169,7 @@ body {
 	text-decoration: underline;
 }
 
-/* Keyboard hints and the help dialog mean nothing without a keyboard. */
+/* Keyboard hints mean nothing without a keyboard. */
 .touch-only {
 	display: none;
 }
@@ -409,26 +181,5 @@ body {
 
 	.touch-only {
 		display: inline;
-	}
-
-	.help {
-		display: none;
-	}
-}
-
-/* Touch has no hover and no keyboard: make rows read as tap targets. */
-@media (pointer: coarse) {
-	.doc-link {
-		grid-template-columns: minmax(0, 1fr);
-		padding: 0.7rem 0.5ch;
-	}
-
-	/* No cursor gutter to line up with here. */
-	.find-input {
-		margin-left: 0.5ch;
-	}
-
-	.doc-cursor {
-		display: none;
 	}
 }

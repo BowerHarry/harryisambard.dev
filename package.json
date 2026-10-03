@@ -10,6 +10,8 @@
     "sync": "node scripts/sync-content.mjs",
     "build": "npm run sync && astro build",
     "preview": "astro preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "deploy:hook": "wrangler deploy -c worker/wrangler.jsonc",
     "astro": "astro"
   },
@@ -25,6 +27,9 @@
     "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.22.0",
+    "jsdom": "^27.0.1",
+    "vitest": "^4.1.11",
     "wrangler": "^4.114.0"
   }
 }

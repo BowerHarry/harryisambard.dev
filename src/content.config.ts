@@ -3,9 +3,9 @@ import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 
 /**
- * Documents are Markdown files on disk, mirrored from Dropbox before the build
- * by `scripts/sync-content.mjs`. `src/lib/docs.ts` is what the rest of the site
- * reads.
+ * Documents are Markdown files in src/content/files, which is not in the
+ * repository: `scripts/sync-content.mjs` mirrors it down from Dropbox before
+ * Astro runs. By the time this loader looks, they are ordinary local files.
  */
 const files = defineCollection({
 	loader: glob({ pattern: '*.md', base: './src/content/files' }),
