@@ -87,6 +87,14 @@ describe('the scroll percentage', () => {
 		expect(meta()).toBe('33%');
 	});
 
+	test('stays between 0% and 100% when the pane is pulled past either end', () => {
+		scrollPaneTo(-120);
+		expect(meta()).toBe('0%');
+
+		scrollPaneTo(2150);
+		expect(meta()).toBe('100%');
+	});
+
 	test('is blank for a document shorter than the pane', () => {
 		loadPage({ open: 'alpha', pane: { clientHeight: 500, scrollHeight: 500, scrollTop: 0 } });
 

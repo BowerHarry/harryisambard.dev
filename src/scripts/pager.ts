@@ -29,7 +29,14 @@ function init() {
 		const scrollable = pane!.scrollHeight - pane!.clientHeight;
 		// A document shorter than the pane has no position to report, so it says
 		// nothing rather than something that reads as a measurement.
-		meta.textContent = scrollable > 0 ? `${Math.round((pane!.scrollTop / scrollable) * 100)}%` : '';
+		if (scrollable <= 0) {
+			meta.textContent = '';
+			return;
+		}
+
+		// Rubber-band scrolling pulls scrollTop past either end, so hold it in range.
+		const top = Math.min(Math.max(pane!.scrollTop, 0), scrollable);
+		meta.textContent = `${Math.round((top / scrollable) * 100)}%`;
 	}
 
 	function by(amount: number) {
