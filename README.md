@@ -34,6 +34,8 @@ nothing to log into.
   <img src="docs/images/mobile.png" alt="The same document on a phone-width screen, with a link back to the file list" width="24%">
 </p>
 
+![The photo gallery open over a document, showing the first of three photos with its caption](docs/images/gallery.jpg)
+
 ## Technical highlights
 
 - **Mirror, not loader.** A pre-build script copies the Dropbox folder into
