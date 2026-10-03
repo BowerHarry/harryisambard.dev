@@ -10,7 +10,7 @@
  * is told in weight, size and space alone, the way iA Writer's preview does it.
  * Prose stays proportional at a readable measure, because a 9,000-word
  * dissertation in monospace is a punishment; code and tables keep the
- * monospace. Colours come from the tokens in terminal.css, so the pane follows
+ * monospace. Colours come from the tokens in theme.css, so the pane follows
  * the browser's light/dark preference along with everything else.
  */
 

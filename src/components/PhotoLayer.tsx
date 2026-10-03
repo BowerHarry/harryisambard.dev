@@ -1,13 +1,8 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { useFloating, offset, flip, shift, autoUpdate, FloatingPortal } from '@floating-ui/react';
-
-type Photo = {
-	alt: string;
-	thumb: { src: string; width: number; height: number };
-	full: { src: string; width: number; height: number };
-};
-
-type Photos = Record<string, Photo[]>;
+import { useRef, useState, type ReactNode } from 'react';
+import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/react';
+import PhotoGallery from './PhotoGallery';
+import PhotoPopup from './PhotoPopup';
+import type { Photos } from './photo-types';
 
 const HOVER_DELAY = 150;
 const HIDE_DELAY = 200;
@@ -18,6 +13,10 @@ function phraseAt(target: EventTarget | null) {
 	return (target as HTMLElement | null)?.closest?.('[data-photo-key]') as HTMLElement | null;
 }
 
+/**
+ * Wraps a document and watches its `photos:` phrases: hovering one shows the
+ * popup, clicking one opens the gallery. This holds the state for both.
+ */
 export default function PhotoLayer({
 	photos = {},
 	children,
@@ -38,31 +37,17 @@ export default function PhotoLayer({
 		whileElementsMounted: autoUpdate,
 	});
 
-	useEffect(() => {
-		if (!gallery) return;
-		const count = (photos[gallery.key] ?? []).length;
-
-		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') setGallery(null);
-			if (event.key === 'ArrowRight')
-				setGallery((g) => g && { ...g, index: Math.min(g.index + 1, count - 1) });
-			if (event.key === 'ArrowLeft')
-				setGallery((g) => g && { ...g, index: Math.max(g.index - 1, 0) });
-		};
-
-		document.addEventListener('keydown', onKeyDown);
-		// The document pane is the scroller, not <body>; terminal.css freezes it
-		// off this class so the page doesn't scroll behind the gallery.
-		document.documentElement.classList.add('is-overlaid');
-		return () => {
-			document.removeEventListener('keydown', onKeyDown);
-			document.documentElement.classList.remove('is-overlaid');
-		};
-	}, [gallery, photos]);
-
 	function openGallery(key: string, index: number) {
 		setPopupKey(null);
 		setGallery({ key, index });
+	}
+
+	function stepGallery(delta: number) {
+		setGallery((g) => {
+			if (!g) return g;
+			const last = (photos[g.key] ?? []).length - 1;
+			return { ...g, index: Math.max(0, Math.min(g.index + delta, last)) };
+		});
 	}
 
 	function handleClick(event: React.MouseEvent) {
@@ -95,8 +80,6 @@ export default function PhotoLayer({
 		scheduleHide();
 	}
 
-	const current = gallery ? photos[gallery.key]?.[gallery.index] : undefined;
-
 	return (
 		<>
 			<div onClick={handleClick} onMouseOver={handleMouseOver} onMouseOut={handleMouseOut}>
@@ -104,57 +87,23 @@ export default function PhotoLayer({
 			</div>
 
 			{popupKey && (
-				<FloatingPortal>
-					<div
-						ref={refs.setFloating}
-						style={floatingStyles}
-						className="photo-popup"
-						onMouseEnter={() => clearTimeout(hideTimer.current)}
-						onMouseLeave={scheduleHide}
-					>
-						{(photos[popupKey] ?? []).map((photo, index) => (
-							<img
-								key={photo.thumb.src}
-								src={photo.thumb.src}
-								alt={photo.alt}
-								width={photo.thumb.width}
-								height={photo.thumb.height}
-								onClick={() => openGallery(popupKey, index)}
-							/>
-						))}
-					</div>
-				</FloatingPortal>
+				<PhotoPopup
+					photos={photos[popupKey] ?? []}
+					setFloating={refs.setFloating}
+					style={floatingStyles}
+					onMouseEnter={() => clearTimeout(hideTimer.current)}
+					onMouseLeave={scheduleHide}
+					onPick={(index) => openGallery(popupKey, index)}
+				/>
 			)}
 
-			{current && (
-				<FloatingPortal>
-					<div
-						className="photo-gallery"
-						onClick={(event) => {
-							if (event.target === event.currentTarget) setGallery(null);
-						}}
-					>
-						<figure>
-							<img
-								src={current.full.src}
-								alt={current.alt}
-								width={current.full.width}
-								height={current.full.height}
-							/>
-							<figcaption>{current.alt}</figcaption>
-						</figure>
-						<p className="photo-hint">
-							<kbd>esc</kbd> close
-							{(photos[gallery.key] ?? []).length > 1 && (
-								<>
-									{" · "}
-									<kbd>←/→</kbd> browse {gallery.index + 1}/
-									{(photos[gallery.key] ?? []).length}
-								</>
-							)}
-						</p>
-					</div>
-				</FloatingPortal>
+			{gallery && (
+				<PhotoGallery
+					photos={photos[gallery.key] ?? []}
+					index={gallery.index}
+					onStep={stepGallery}
+					onClose={() => setGallery(null)}
+				/>
 			)}
 		</>
 	);

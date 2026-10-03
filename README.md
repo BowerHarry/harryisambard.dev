@@ -62,7 +62,7 @@ Dropbox edit — publishes whatever is in Dropbox at that moment.
 | Dropbox API | Where the documents actually live |
 
 No CSS framework and no client-side router beyond Astro's view transitions. The
-styling is three hand-written stylesheets.
+styling is a handful of hand-written stylesheets.
 
 ## Structure
 
@@ -72,13 +72,17 @@ styling is three hand-written stylesheets.
 | `src/pages/index.astro` | The list with no document open |
 | `src/pages/[id].astro` | One route per document |
 | `src/components/DocList.astro` | The searchable file list |
-| `src/components/PhotoLayer.tsx` | React island: photo popup and gallery |
-| `src/scripts/find.ts` | Filtering and cursor movement in the left pane |
+| `src/components/PhotoLayer.tsx` | React island: the state behind `PhotoPopup.tsx` and `PhotoGallery.tsx` |
+| `src/scripts/find.ts` | The keyboard and focus of the left pane |
+| `src/scripts/doc-list.ts` | Filtering and cursor movement in the list |
 | `src/scripts/pager.ts` | `less`-style scrolling in the right pane |
 | `src/lib/docs.ts` | The only module that talks to `astro:content` |
 | `src/plugins/rehype-photo-links.mjs` | Turns `photos:` links into gallery triggers |
-| `scripts/sync-content.mjs` | Dropbox → `src/content/` |
+| `src/styles/` | `theme.css` holds the tokens; one stylesheet each for the shell, the list, the help panel, documents and photos |
+| `scripts/sync-content.mjs` | Dropbox → `src/content/`; the steps are in `scripts/sync/` |
 | `worker/index.js` | Dropbox webhook → debounced Pages build |
+| `worker/signature.js` | Checks a notification really is Dropbox's |
+| `tests/` | The tests, laid out like the code they cover |
 
 ## Writing a document
 
@@ -150,11 +154,40 @@ and fill in a Dropbox app key, secret and refresh token.
 | `npm run dev` | Sync, then serve on `localhost:4321` |
 | `npm run sync` | Mirror the content down from Dropbox |
 | `npm run build` | Sync, then build to `./dist/` |
+| `npm test` | Run the tests once |
+| `npm run test:watch` | Rerun the tests as files change |
 | `npm run deploy:hook` | Deploy the webhook Worker |
 
 Both `dev` and `build` sync first, so local work starts from the same documents
 the live site has. The dev server does not watch Dropbox while it runs — rerun
 `npm run sync` to pick up an edit made elsewhere mid-session.
+
+## Tests
+
+```sh
+npm test
+```
+
+[Vitest](https://vitest.dev) runs everything, in three groups set up in
+`vitest.config.mjs`. None of them touch the network, the real `.env` or
+`src/content/`.
+
+| Tests | Cover | Run in |
+| :--- | :--- | :--- |
+| `tests/sync/` | The Dropbox hash, the API calls, which files are downloaded, restamped or removed, and what happens without credentials | Node, against a fake Dropbox and a scratch folder |
+| `tests/plugins/` | The `photos:` link rewrite, its build error and its warning | Node |
+| `tests/scripts/` | Filtering, the cursor, and which pane a key goes to | jsdom, on a cut-down copy of the page |
+| `tests/worker/` | The signature check, the challenge echo, and the build scheduler's quiet window, minimum gap and retry | The Workers runtime, via `@cloudflare/vitest-pool-workers` |
+
+To run one group or one file:
+
+```sh
+npx vitest run --project worker
+npx vitest run tests/scripts/find.test.ts
+```
+
+The React photo popup and gallery, the Astro templates and the stylesheets have
+no tests; `npx astro build` is the check that they still compile.
 
 ## Deployment
 
