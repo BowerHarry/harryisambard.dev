@@ -4,7 +4,7 @@ A terminal-inspired personal site that republishes itself whenever I save a
 markdown file to Dropbox.
 
 **Status:** live at [www.harryisambard.dev](https://www.harryisambard.dev). Still
-being worked on, and it has no automated tests yet.
+being worked on.
 
 ![A document open in the two-pane layout: file list on the left, rendered markdown on the right](docs/images/document.png)
 
