@@ -1,0 +1,110 @@
+/* The left pane: the filter box and the list of documents under it. */
+
+.find {
+	display: flex;
+	align-items: baseline;
+	margin-bottom: 1.4rem;
+}
+
+.find-input {
+	flex: 1 1 auto;
+	min-width: 0;
+	max-width: 32ch;
+	background: none;
+	border: 0;
+	border-bottom: 1px solid var(--rule);
+	color: var(--fg);
+	font: inherit;
+	padding: 0 0 0.15rem;
+	/* Starts at the column the filenames do, past the cursor gutter. A margin
+	   rather than padding, so the rule underneath starts with the text. */
+	margin-left: 3ch;
+	caret-color: var(--cursor);
+}
+
+.find-input::placeholder {
+	color: var(--dim);
+	opacity: 0.7;
+}
+
+.find-input:focus {
+	outline: none;
+	border-bottom-color: var(--cursor);
+}
+
+.docs {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.doc-link {
+	display: grid;
+	grid-template-columns: 1ch minmax(0, 1fr);
+	align-items: baseline;
+	gap: 0 1.5ch;
+	padding: 0.3rem 0.5ch;
+	color: inherit;
+	text-decoration: none;
+	border-radius: 3px;
+}
+
+.doc-cursor {
+	color: var(--cursor);
+	visibility: hidden;
+}
+
+.doc.is-selected .doc-link {
+	background: var(--cursor-bg);
+}
+
+.doc.is-selected .doc-cursor {
+	visibility: visible;
+}
+
+.doc.is-selected .doc-name {
+	color: var(--cursor);
+}
+
+/* The document in the right pane, which is not always where the cursor is: the
+   tinted row is the cursor, the coloured name is what's open. */
+.doc.is-open .doc-name {
+	color: var(--path);
+	font-weight: 600;
+}
+
+.doc-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.doc-match {
+	background: none;
+	color: var(--path);
+	font-weight: 700;
+	/* Underlined as well as coloured: the open row's name is already this colour. */
+	text-decoration: underline;
+}
+
+.docs-empty {
+	color: var(--dim);
+	margin: 0.5rem 0.5ch;
+}
+
+/* Touch has no hover and no keyboard: make rows read as tap targets. */
+@media (pointer: coarse) {
+	.doc-link {
+		grid-template-columns: minmax(0, 1fr);
+		padding: 0.7rem 0.5ch;
+	}
+
+	/* No cursor gutter to line up with here. */
+	.find-input {
+		margin-left: 0.5ch;
+	}
+
+	.doc-cursor {
+		display: none;
+	}
+}

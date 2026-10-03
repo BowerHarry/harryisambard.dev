@@ -1,0 +1,70 @@
+/* The `?` overlay listing the keyboard shortcuts. */
+
+.help {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	padding: 1rem;
+	background: var(--overlay);
+	backdrop-filter: blur(2px);
+}
+
+/* `display` on the rule above would otherwise beat [hidden]. */
+.help[hidden] {
+	display: none;
+}
+
+.help-panel {
+	min-width: min(26rem, 100%);
+	padding: 1.2rem 1.4rem;
+	background: var(--bg);
+	border: 1px solid var(--cursor);
+	border-radius: 4px;
+	box-shadow: 0 12px 36px rgb(0 0 0 / 18%);
+}
+
+.help-title {
+	margin: 0 0 1rem;
+	color: var(--cursor);
+	font-size: 0.8125rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+/* The panel lists both key sets; each one after the first needs its own space. */
+.help-keys + .help-title {
+	margin-top: 1.4rem;
+}
+
+.help-keys {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 0.45rem 2ch;
+	margin: 0;
+}
+
+.help-keys dt {
+	color: var(--path);
+	white-space: nowrap;
+}
+
+.help-keys dd {
+	margin: 0;
+	color: var(--dim);
+}
+
+.help-dismiss {
+	margin: 1.2rem 0 0;
+	padding-top: 0.9rem;
+	border-top: 1px solid var(--rule);
+	color: var(--dim);
+	font-size: 0.8125rem;
+}
+
+/* The dialog means nothing without a keyboard. */
+@media (pointer: coarse) {
+	.help {
+		display: none;
+	}
+}

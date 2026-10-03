@@ -1,4 +1,5 @@
 import { DurableObject } from 'cloudflare:workers';
+import { fromDropbox } from './signature.js';
 
 /**
  * Turns Dropbox edits into Pages builds.
@@ -20,33 +21,6 @@ const MIN_GAP_MS = 5 * 60_000;
 
 /** A failed deploy hook is worth retrying; Pages is occasionally busy. */
 const RETRY_MS = 60_000;
-
-/** Compare without leaking where two strings first differ. */
-function sameSignature(a, b) {
-	if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
-
-	let difference = 0;
-	for (let at = 0; at < a.length; at += 1) difference |= a.charCodeAt(at) ^ b.charCodeAt(at);
-	return difference === 0;
-}
-
-/** Dropbox signs the raw body with the app secret: HMAC-SHA256, hex. */
-async function fromDropbox(body, signature, secret) {
-	if (!signature || !secret) return false;
-
-	const key = await crypto.subtle.importKey(
-		'raw',
-		new TextEncoder().encode(secret),
-		{ name: 'HMAC', hash: 'SHA-256' },
-		false,
-		['sign']
-	);
-
-	const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(body));
-	const hex = [...new Uint8Array(mac)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
-
-	return sameSignature(hex, signature);
-}
 
 export default {
 	async fetch(request, env) {
