@@ -12,8 +12,7 @@ export async function getStaticPaths() {
 
 const { doc, entry } = Astro.props
 
-// `<Content />` also resolves the images referenced from the Markdown body,
-// which the old fetch-the-HTML-as-JSON approach could not do.
+// `<Content />` also resolves the images referenced from the Markdown body.
 const { Content } = await render(entry)
 const photos = await buildPhotos(entry.data.photos)
 ---
